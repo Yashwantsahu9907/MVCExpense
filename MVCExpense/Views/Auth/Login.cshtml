@@ -1,0 +1,20 @@
+﻿@using MVCExpense.DTO
+@model LoginDto
+<div>@ViewBag.SuccessMessage</div>
+<div>@ViewBag.ErrorMessage </div>
+
+<form class="w-50 mx-auto mt-5 p-4 border rounded shadow" asp-action="LoginUser">
+    <h2 class="text-center mb-4">Login</h2>
+
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" asp-for="Email" class="form-control" placeholder="Enter your email" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" asp-for="Password" class="form-control" placeholder="Enter your password" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Login</button>
+</form>
