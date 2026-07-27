@@ -7,21 +7,20 @@ using System.Security.Claims;
 
 namespace MVCExpense.Controllers;
 
-[Authorize] // Requires a valid JWT token/cookie to access any action in this controller
+[Authorize] 
 public class IncomeController(AppDbContext context) : Controller
 {
     private readonly AppDbContext _context = context;
 
-    // Securely extract the UserId from the logged-in user's claims
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-    // Display a list of all income records belonging to the logged-in user
+    // All income record 
     [HttpGet]
     public async Task<IActionResult> Index()
     {
         var userId = GetUserId();
         var incomes = await _context.Incomes
-            .Where(i => i.UserId == userId && !i.IsDeleted) // Isolation check
+            .Where(i => i.UserId == userId && !i.IsDeleted)
             .OrderByDescending(i => i.IncomeDate)
             .ToListAsync();
         ViewBag.SuccessMessage = TempData["SuccessMessage"];
@@ -42,7 +41,6 @@ public class IncomeController(AppDbContext context) : Controller
         ModelState.Remove("User"); // Exclude navigation property from validation
         if (!ModelState.IsValid) return View(income);
 
-        // Enforce the relationship: Attach this income directly to the logged-in user
         income.UserId = GetUserId();
         income.CreatedAt = DateTime.UtcNow;
         income.CreatedBy = income.UserId;
@@ -55,12 +53,11 @@ public class IncomeController(AppDbContext context) : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Open the edit page for a specific income, verifying ownership
+    // Open the edit page
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
         var userId = GetUserId();
-        // Fetch only if the income belongs to the active user (Isolation check)
         var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId && !i.IsDeleted);
         if (income == null) return NotFound();
 
@@ -71,11 +68,10 @@ public class IncomeController(AppDbContext context) : Controller
     [HttpPost]
     public async Task<IActionResult> Edit(Income income)
     {
-        ModelState.Remove("User");
+        ModelState.Remove("User");    // Remove from validation 
         if (!ModelState.IsValid) return View(income);
 
         var userId = GetUserId();
-        // Fetch the existing record from DB safely utilizing user isolation
         var existingIncome = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == income.Id && i.UserId == userId && !i.IsDeleted);
         if (existingIncome == null) return NotFound();
 
@@ -112,7 +108,6 @@ public class IncomeController(AppDbContext context) : Controller
         var income = await _context.Incomes.FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId && !i.IsDeleted);
         if (income == null) return NotFound();
 
-        // Soft delete: Flag as deleted instead of fully dropping from the database table
         income.IsDeleted = true;
         income.UpdatedAt = DateTime.UtcNow;
         income.UpdatedBy = userId;

@@ -8,23 +8,21 @@ using System.Security.Claims;
 
 namespace MVCExpense.Controllers;
 
-[Authorize] // Requires a valid JWT token/cookie to access any action in this controller
+[Authorize]
 public class ExpenseController(AppDbContext context) : Controller
 {
     private readonly AppDbContext _context = context;
 
-    // securely extract the UserId from the logged-in user's claims
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-    // Helper method to populate the Categories dropdown exclusively with categories created by the logged-in user
-    private async Task PopulateCategoriesAsync(int? selectedId = null)
+    private async Task PopulateCategoriesAsync(int? selectedId = null)   // PopulateCategoriesAsync ye method expense ke dropdown me category load karata hai 
     {
         var userId = GetUserId();
         var categories = await _context.Categories
-            .Where(c => c.UserId == userId && !c.IsDeleted) // Isolation: Only the current user's categories
+            .Where(c => c.UserId == userId && !c.IsDeleted) 
             .OrderBy(c => c.Name)
             .ToListAsync();
-        ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedId);
+        ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedId);    // create dropdown  value = id, display = name
     }
 
     // Display a list of all expenses belonging to the logged-in user
@@ -33,15 +31,15 @@ public class ExpenseController(AppDbContext context) : Controller
     {
         var userId = GetUserId();
         var expenses = await _context.Expenses
-            .Include(e => e.Category) // Include related Category data to display Category Name
-            .Where(e => e.UserId == userId && !e.IsDeleted) // Isolation check
+            .Include(e => e.Category) // y the using of include it help to show the category name instead of id category ke obj load karta hai 
+            .Where(e => e.UserId == userId && !e.IsDeleted) 
             .OrderByDescending(e => e.CreatedAt)
             .ToListAsync();
         ViewBag.SuccessMessage = TempData["SuccessMessage"];
         return View(expenses);
     }
 
-    // Open the page to create a new expense
+    // Open the page 
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -49,21 +47,19 @@ public class ExpenseController(AppDbContext context) : Controller
         return View();
     }
 
-    // Handle the submission of a new expense
+    // Create new expense 
     [HttpPost]
     public async Task<IActionResult> Create(Expense expense)
     {
-        // Remove related objects from validation since they are not bound in the form
-        ModelState.Remove("User");
+        ModelState.Remove("User");   // naviguation property remove category id aati hai validation fail na ho isliye remove 
         ModelState.Remove("Category");
         
         if (!ModelState.IsValid)
         {
-            await PopulateCategoriesAsync(expense.CategoryId); // Reload dropdown on error
+            await PopulateCategoriesAsync(expense.CategoryId); // reload dropdown when validation is fail if it is not assign dropdown become null
             return View(expense);
         }
 
-        // Enforce the relationship: Attach this expense directly to the logged-in user
         expense.UserId = GetUserId();
         expense.CreatedAt = DateTime.UtcNow;
         expense.CreatedBy = expense.UserId;
@@ -76,12 +72,11 @@ public class ExpenseController(AppDbContext context) : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Open the edit page for a specific expense, verifying ownership
+    // Edit expense
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
         var userId = GetUserId();
-        // Fetch only if the expense belongs to the active user (Isolation check)
         var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id && e.UserId == userId && !e.IsDeleted);
         if (expense == null) return NotFound();
 
@@ -102,7 +97,6 @@ public class ExpenseController(AppDbContext context) : Controller
         }
 
         var userId = GetUserId();
-        // Fetch the existing record from DB safely utilizing user isolation
         var existingExpense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == expense.Id && e.UserId == userId && !e.IsDeleted);
         if (existingExpense == null) return NotFound();
 
@@ -121,7 +115,6 @@ public class ExpenseController(AppDbContext context) : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Show the confirmation page to delete an expense, verifying ownership
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {

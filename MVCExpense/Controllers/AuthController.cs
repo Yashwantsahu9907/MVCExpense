@@ -10,7 +10,7 @@ using System.Text;
 
 namespace MVCExpense.Controllers;
 
-public class AuthController(AppDbContext context) : Controller
+public class AuthController(AppDbContext context) : Controller       // Dependency injection  by using primary constructor method
 {
     private readonly AppDbContext _context = context;
     public IActionResult Login()
@@ -97,7 +97,7 @@ public class AuthController(AppDbContext context) : Controller
     [HttpGet]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("JwtToken");
+        Response.Cookies.Delete("JwtToken");    // delete cookie  - if you dont delete cookie browser still send token and server may still treat as logged in 
         TempData["SuccessMessage"] = "Logged out successfully";
         return RedirectToAction("Login");
     }

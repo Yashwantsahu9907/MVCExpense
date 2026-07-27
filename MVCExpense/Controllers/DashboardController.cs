@@ -7,29 +7,27 @@ using System.Security.Claims;
 
 namespace MVCExpense.Controllers;
 
-[Authorize] // Ensures only logged-in users can access the dashboard
+[Authorize]
 public class DashboardController(AppDbContext context) : Controller
 {
     private readonly AppDbContext _context = context;
 
-    // Helper method to retrieve the currently logged-in user's ID securely from their JWT claims
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     public async Task<IActionResult> Index()
     {
         var userId = GetUserId(); // Get the active user's ID
 
-        // Calculate total income by summing up all valid income records for this specific user
+        // Calculate total income by sum of valid  income of specific user
         var totalIncome = await _context.Incomes
             .Where(i => i.UserId == userId && !i.IsDeleted)
             .SumAsync(i => i.Amount);
-
-        // Calculate total expense by summing up all valid expense records for this specific user
+        // calulate expense 
         var totalExpense = await _context.Expenses
             .Where(e => e.UserId == userId && !e.IsDeleted)
             .SumAsync(e => e.Amount);
 
-        // Calculate current balance by subtracting total expenses from total income
+        // Calculate current balance
         var balance = totalIncome - totalExpense;
 
         // Fetch the 5 most recent income transactions, selecting only necessary fields to optimize performance

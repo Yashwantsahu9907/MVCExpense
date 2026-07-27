@@ -12,19 +12,19 @@ public class CategoryController(AppDbContext context) : Controller
 {
     private readonly AppDbContext _context = context;
 
-    // Securely extract the UserId from the logged-in user's claims
+    // Securely extract the UserId from the loggedin  user
     private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     // Display a list of all category records belonging to the logged-in user
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var userId = GetUserId();
+        var userId = GetUserId();    // current login user ki id nikal raha hai 
         var categories = await _context.Categories
             .Where(c => c.UserId == userId && !c.IsDeleted) // Isolation check
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
-        ViewBag.SuccessMessage = TempData["SuccessMessage"];
+        ViewBag.SuccessMessage = TempData["SuccessMessage"];    
         return View(categories);
     }
 
@@ -35,19 +35,18 @@ public class CategoryController(AppDbContext context) : Controller
         return View();
     }
 
-    // Handle the submission of a new category record
+    // Create new category record 
     [HttpPost]
     public async Task<IActionResult> Create(Category category)
     {
         ModelState.Remove("User"); // Exclude navigation property from validation
         if (!ModelState.IsValid)
             return View(category);
-
-        // Enforce the relationship: Attach this category directly to the logged-in user
-        category.UserId = GetUserId();
+        
+        category.UserId = GetUserId();  // user id assign by serverr  due to security reason 
         category.CreatedAt = DateTime.UtcNow;
         category.CreatedBy = category.UserId;
-        category.IsDeleted = false;
+        category.IsDeleted = false;     // new record is not deleted
 
         _context.Categories.Add(category);
         await _context.SaveChangesAsync();
@@ -56,12 +55,11 @@ public class CategoryController(AppDbContext context) : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Open the edit page for a specific category, verifying ownership
+    //  Edit category 
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
         var userId = GetUserId();
-        // Fetch only if the category belongs to the active user (Isolation check)
         var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId && !c.IsDeleted);
         if (category == null) return NotFound();
 
@@ -76,7 +74,6 @@ public class CategoryController(AppDbContext context) : Controller
         if (!ModelState.IsValid) return View(category);
 
         var userId = GetUserId();
-        // Fetch the existing record from DB safely utilizing user isolation
         var existingCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Id == category.Id && c.UserId == userId && !c.IsDeleted);
         if (existingCategory == null) return NotFound();
 
