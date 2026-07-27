@@ -40,6 +40,7 @@ public class AuthController(AppDbContext context) : Controller
                 Email = dto.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Name = dto.Name,
+                CreatedAt = DateTime.UtcNow
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
