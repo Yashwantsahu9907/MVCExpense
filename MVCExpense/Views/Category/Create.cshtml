@@ -1,0 +1,52 @@
+﻿@using MVCExpense.DTO
+
+@model MVCExpense.Models.Category
+
+@{
+    ViewData["Title"] = "Add Category";
+}
+
+<div class="container mt-5">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+            <h4>Add Category</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Create" method="post">
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+
+                    <input asp-for="Name"
+                           class="form-control"
+                           placeholder="Enter category name" />
+
+                    <span asp-validation-for="Name"
+                          class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Save
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

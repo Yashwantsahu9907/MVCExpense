@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MVCExpense.Data;
@@ -94,6 +94,14 @@ public class AuthController(AppDbContext context) : Controller
     }
 
 
+    [HttpGet]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete("JwtToken");
+        TempData["SuccessMessage"] = "Logged out successfully";
+        return RedirectToAction("Login");
+    }
+
     // JWT AUTHENTICATION
     private string GetJwtToken(User user)
     {
@@ -101,6 +109,7 @@ public class AuthController(AppDbContext context) : Controller
         {
              new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  //password will not pass here due to security risk
              new Claim(ClaimTypes.Email, user.Email),
+             new Claim(ClaimTypes.Name, user.Name)
         };
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes("9khIuQ1ANQnfq2lhRZRFG4wpIGPIdN7w1AeOO9MltDXYnRhY2XhCt5di62hsC8cv")

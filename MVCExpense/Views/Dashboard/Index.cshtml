@@ -1,0 +1,100 @@
+@using MVCExpense.DTO
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Expense Tracker Dashboard</h2>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-success shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Income</h5>
+                    <h2 class="text-success">@ViewBag.TotalIncome?.ToString("C")</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-danger shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Expense</h5>
+                    <h2 class="text-danger">@ViewBag.TotalExpense?.ToString("C")</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-primary shadow">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Current Balance</h5>
+                    <h2 class="text-primary">@ViewBag.Balance?.ToString("C")</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mb-4">
+        <a asp-controller="Income" asp-action="Create" class="btn btn-success me-2">+ Add Income</a>
+        <a asp-controller="Expense" asp-action="Create" class="btn btn-danger me-2">+ Add Expense</a>
+        <a asp-controller="Category" asp-action="Create" class="btn btn-primary">+ Add Category</a>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Recent Transaction History</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Title</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.RecentHistory != null)
+                    {
+                        foreach (var item in ViewBag.RecentHistory)
+                        {
+                            <tr>
+                                <td>@item.Date.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if(item.Type == "Income")
+                                    {
+                                        <span class="badge bg-success">Income</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Expense</span>
+                                    }
+                                </td>
+                                <td>@item.Title</td>
+                                <td>@item.Amount.ToString("C")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">No history available</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

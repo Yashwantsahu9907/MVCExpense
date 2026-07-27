@@ -1,0 +1,32 @@
+@model MVCExpense.Models.Expense
+
+@{
+    ViewData["Title"] = "Delete Expense";
+}
+
+<div class="container mt-4">
+    <h2>Delete Expense</h2>
+    <h3 class="text-danger">Are you sure you want to delete this?</h3>
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-3">Title</dt>
+            <dd class="col-sm-9">@Model.Title</dd>
+            
+            <dt class="col-sm-3">Amount</dt>
+            <dd class="col-sm-9">@Model.Amount.ToString("C")</dd>
+            
+            <dt class="col-sm-3">Category</dt>
+            <dd class="col-sm-9">@(Model.Category?.Name ?? "N/A")</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+        </dl>
+        
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
