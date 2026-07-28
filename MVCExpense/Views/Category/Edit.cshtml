@@ -1,7 +1,7 @@
 @model MVCExpense.Models.Category
 
 @{
-    ViewData["Title"] = "Edit Category";
+    ViewData["Title"] = "Edit Category";    // set title of browser tag
 }
 
 <div class="container mt-4">
@@ -10,7 +10,8 @@
     <div class="row">
         <div class="col-md-4">
             <form asp-action="Edit" method="post">
-                <input type="hidden" asp-for="Id" />
+                @* not seen on browse but value got  to the server when user submit *@
+                <input type="hidden" asp-for="Id" />    
                 <div class="form-group mb-3">
                     <label asp-for="Name" class="control-label"></label>
                     <input asp-for="Name" class="form-control" />

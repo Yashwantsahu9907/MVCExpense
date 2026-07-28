@@ -1,9 +1,7 @@
-﻿@using MVCExpense.DTO
-
-@model MVCExpense.Models.Category
+﻿@model MVCExpense.Models.Category
 
 @{
-    ViewData["Title"] = "Add Category";
+    ViewData["Title"] = "Add Category";  // just like a dictionary  and its store   Addcategory 
 }
 
 <div class="container mt-5">
@@ -21,22 +19,12 @@
                 <div class="mb-3">
                     <label asp-for="Name" class="form-label"></label>
 
-                    <input asp-for="Name"
-                           class="form-control"
-                           placeholder="Enter category name" />
-
-                    <span asp-validation-for="Name"
-                          class="text-danger"></span>
+                    <input asp-for="Name" class="form-control" placeholder="Enter category name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
 
-                <button type="submit" class="btn btn-success">
-                    Save
-                </button>
-
-                <a asp-action="Index"
-                   class="btn btn-secondary">
-                    Back
-                </a>
+                <button type="submit" class="btn btn-success">Save </button>
+                <a asp-action="Index" class="btn btn-secondary"> Back </a>
 
             </form>
 
@@ -46,7 +34,8 @@
 
 </div>
 
-@section Scripts
+@*  help to run javascript *@
+@section Scripts            
 {
     <partial name="_ValidationScriptsPartial" />
 }

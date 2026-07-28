@@ -1,7 +1,6 @@
-@using MVCExpense.DTO
 
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Dashboard";    // set title on browser tag
 }
 
 <div class="container mt-4">
@@ -68,7 +67,7 @@
                 <tbody>
                     @if (ViewBag.RecentHistory != null)
                     {
-                        foreach (var item in ViewBag.RecentHistory)
+                        foreach (var item in ViewBag.RecentHistory)    // if history available tab loop chalega  nahi to no history available dikhega
                         {
                             <tr>
                                 <td>@item.Date.ToString("yyyy-MM-dd")</td>
